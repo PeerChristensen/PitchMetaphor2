@@ -27,7 +27,7 @@ df$Words=gsub("√•","å",df$Words)
 df$Words=gsub("√§","ä",df$Words)
 
 ### WRITE NEW DATAFILE
-write.csv2(df,"PitchMetaphor2_CLEAN.csv")
+#write.csv2(df,"PitchMetaphor2_CLEAN.csv")
 
 ### WRITE AGAIN (AFTER MANUAL EDITS) - NEED TO CHANGE Metaphor labels
 df = read.csv2("PitchMetaphor2_CLEAN_edit.csv")
@@ -37,12 +37,20 @@ df2$Metaphor[df2$Words=="ince"] = "Thickness"
 df2$Metaphor[df2$Words=="kalin"] = "Thickness"
 df2$Metaphor[df2$Words=="koyu"] = "Brightness"
 
-write.csv2(df2,"PitchMetaphor2_CLEAN_edit_2.csv")
+#write.csv2(df2,"PitchMetaphor2_CLEAN_edit_2.csv")
 
 df3=df2
 df3$Metaphor[df3$Words=="högt"] = "Height"
 
-write.csv2(df3,"PitchMetaphor2_CLEAN_edit_3.csv")
+#write.csv2(df3,"PitchMetaphor2_CLEAN_edit_3.csv")
+
+### INCLUDE GESTURES (where removed by mistake)
+df4=df
+df4$Metaphor[df4$Words=="ince"] = "Thickness"
+df4$Metaphor[df4$Words=="kalin"] = "Thickness"
+df4$Metaphor[df4$Words=="koyu"] = "Brightness"
+df4$Metaphor[df4$Words=="högt"] = "Height"
+#write.csv2(df4,"PitchMetaphor2_CLEAN_edit_gesture.csv")
 
 
 ### CREATE FILE WITH GENERAL COMMENTS AND FILE NAME
@@ -52,7 +60,7 @@ comments = df2[,c(1,16)]
 comments = comments[comments$General.comments!="",]
 comments = comments[!duplicated(comments),]
 
-write.csv2(comments,"comments.csv")
+#write.csv2(comments,"comments.csv")
 
 
 

@@ -2,8 +2,8 @@
 
 # DESCRIPTION:
 
-# 1. Metaphors and co-expressivity
-# 2. Metaphors with vertical vs. grip/size gesture vs. mixed gesture
+# 1. Metaphors and gesture elicitation
+# 2. Metaphors and co-expressivity
 
 #AUTHOR: PEER CHRISTENSEN
 #FEBRUARY 2018
@@ -27,12 +27,17 @@ dfG$Metaphor[dfG$Metaphor=="?" | dfG$Metaphor=="Mildness" | dfG$Metaphor=="Stren
 
 #-------------------------------------------------------------------------------
 ### NUMBER OF OBSERVATIONS WITH GESTURE
-
 numObs = nrow(dfG)
 # By language
 ObsByLang = table(dfG$Language)
+
 #-------------------------------------------------------------------------------
-### METAPHORS AND CO_EXPRESSIVITY
+### METAPHORS AND GESTURE ELICITATION
+
+#-------------------------------------------------------------------------------
+### METAPHORS AND CO-EXPRESSIVITY
+
+# Create gesture metaphor variable (height,thickness, mixed, none) 
 
 
 
