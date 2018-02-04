@@ -2,6 +2,9 @@
 
 # DESCRIPTION:
 
+# 1. Metaphors
+# 2. Most frequent words grouped by Metaphor
+# 3. Most frequent lemmata grouped by Metaphor
 
 #AUTHOR: PEER CHRISTENSEN
 #FEBRUARY 2018
@@ -12,9 +15,10 @@ library(ggplot2)
 library(plyr)
 library(Hmisc)
 library(reshape)
+library(data.table)
 
-df = read.csv2("PitchMetaphor2_CLEAN_edit.csv",header=T,stringsAsFactors=FALSE)
-df = df[,-c(1,2,4,11:14)]
+df = read.csv2("PitchMetaphor2_CLEAN_edit_3.csv",header=T,stringsAsFactors=FALSE)
+df = df[,-c(1)]
 
 #-------------------------------------------------------------------------------
 ### NUMBER OF OBSERVATIONS
@@ -24,12 +28,13 @@ numObs = nrow(df)
 ObsByLang = table(df$Language)
 
 #-------------------------------------------------------------------------------
-### METAPHORS
+### METAPHORS BY LANGUAGE
 
 #Overview of all metaphors
 allMetaphors = table(df$Metaphor,df$Language)
 
 # Categorise metaphors with < 10 obs. as "Other"
+# Or < 3 % : prop.table(ftable(allMetaphors),2)*100
 df$Metaphor[df$Metaphor=="?" | df$Metaphor=="Mildness" | df$Metaphor=="Strength" |
               df$Metaphor=="Openness" | df$Metaphor=="Roughness" |
               df$Metaphor=="Roundness" | df$Metaphor=="Sharpness"] = "Other"
@@ -68,7 +73,7 @@ sweDat=data.frame(cbind(sweDat[1:6,],
 sweDat[,c(3,5)]=round(sweDat[,c(3,5)],3)
 
 BarSwe <- ggplot(sweDat, aes(x=variable, y=value, fill=Language)) + 
-  geom_bar(position=position_dodge(),stat="identity",fill="#21908CFF" ,colour="gray30") +
+  geom_bar(position=position_dodge(),stat="identity",colour="gray30") + # fill="#21908CFF" 
   geom_errorbar(aes(ymin=value-value.1, ymax=value+value.1), width=.2,
                 position=position_dodge(.9)) +
  # geom_text(aes(label = value, y = 0.3, size = 3)) +
@@ -116,7 +121,7 @@ turDat=data.frame(cbind(turDat[1:4,],
 turDat[,c(3,5)]=round(turDat[,c(3,5)],3)
 
 Bartur <- ggplot(turDat, aes(x=variable, y=value, fill=Language)) + 
-  geom_bar(position=position_dodge(),stat="identity",fill="#21908CFF" ,colour="gray30") +
+  geom_bar(position=position_dodge(),stat="identity" ,colour="gray30") + #add e.g. fill= "Color"
   geom_errorbar(aes(ymin=value-value.1, ymax=value+value.1), width=.2,
                 position=position_dodge(.9)) +
   # geom_text(aes(label = value, y = 0.3, size = 3)) +
@@ -134,12 +139,153 @@ Bartur <- ggplot(turDat, aes(x=variable, y=value, fill=Language)) +
         legend.position = "none")
 Bartur
 
-### WORDS
+#-------------------------------------------------------------------------------
+### WORDS BY METAPHOR
 
-# By metaphor
+wordsMeta=df[,c(2,6,7)]
+wordsMeta=data.table(na.omit(wordsMeta))
 
-# By lemma
+#Swedish
+wordsMetaSwe=wordsMeta[wordsMeta$Language=="Swedish"]
+wordsMetaSwe[,Freq := .N, by=Words]
+wordsMetaSwe=unique(wordsMetaSwe)
+wordsMetaSwe=wordsMetaSwe[order(-Freq)]
+#wordsMetaSwe=wordsMetaSwe[1:15,] -the 15 most frequent words
+wordsMetaSwe$Percent= wordsMetaSwe$Freq/328*100 # 328 given by sum(table(df$Words[df$Language=="Swedish"]))
+wordsMetaSwe=wordsMetaSwe[wordsMetaSwe$Percent>=1]
+wordsMetaSwe=wordsMetaSwe[wordsMetaSwe$Words!="andra"]
+
+wmSwe=ggplot(wordsMetaSwe,aes(reorder(Words,Percent),Percent)) + 
+  geom_bar(stat = "identity",aes(fill=Metaphor),colour="gray30") +
+  #scale_fill_viridis("Metaphor",discrete = TRUE, option = "D") +
+  #scale_fill_manual("Metaphor",values=cols_2) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Words in Swedish grouped by metaphor") +
+  xlab("Words") +
+  ylab("Frequency in %") +
+  coord_flip() +
+  theme_minimal()
+wmSwe
+
+#Turkish
+wordsMetaTur=wordsMeta[wordsMeta$Language=="Turkish"]
+wordsMetaTur[,Freq := .N, by=Words]
+wordsMetaTur=unique(wordsMetaTur)
+wordsMetaTur=wordsMetaTur[order(-Freq)]
+#wordsMetaTur=wordsMetaTur[1:15,] -the 15 most frequent words
+wordsMetaTur$Percent= wordsMetaTur$Freq/257*100
+wordsMetaTur=wordsMetaTur[wordsMetaTur$Percent>=1]
+
+wmTur=ggplot(wordsMetaTur,aes(reorder(Words,Percent),Percent)) + 
+  geom_bar(stat = "identity",aes(fill=Metaphor),colour="gray30") +
+  #scale_fill_viridis("Metaphor",discrete = TRUE, option = "D") +
+  #scale_fill_manual("Metaphor",values=cols_2) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Words in Turkish grouped by metaphor") +
+  xlab("Words") +
+  ylab("Frequency in %") +
+  coord_flip() +
+  theme_minimal()
+wmTur
 
 #-------------------------------------------------------------------------------
+### LEMMATA BY METAPHOR
 
-### LEMMATA
+lemMeta=df[,c(2,6,7)]
+lemMeta$Lemma=revalue(lemMeta$Words, c("ljusare"="bright","lägre"="low","djupa"="deep",
+                                         "högre"="high","mörkare"="dark", "tunn"="thin","mjukare"="soft",
+                                         "tyngre"="heavy","tunnare"="thin","låga"="low",
+                                         "ljus"="bright","ljust"="bright","ljusa"="bright",
+                                         "mörk"="dark","mörka"="dark","mörkt"="dark",
+                                         "hög"="high","höjd"="high","högt"="high","höga"="high",
+                                         "låg"="low","lågt"="low","högre upp"="high up",
+                                         "högt upp"="high up","upp"="up","över"="over",
+                                         "under"="under","djup"="deep","första"="first",
+                                         "andra"="other","ner"="down","kalin"="thick","ince"="thin","yuksek"="high",
+                                         "inceydi"="thin","kalindi"="thick","kalinlikta"="thick","asagda"="down",
+                                         "asaya"="down","asarda"="down", "yukseklerde"="high","yuksekte"="high","yukseliyor"="high",
+                                         "yuksekteydi"="high","dusuk"="low","kalina"="thick","koyu"="dark","altan"="below","acik"="bright",
+                                         "alcak"="low","kalinlik"="thick","inceye"="thin","tok"="full","yukariya"="high",
+                                         "asardaydi"="down","yukarda"="high","yuksekti" = "high", "kalindi" = "thick","yumsak"="soft",
+                                       "ustte"="above","ustunde"="above","kalinca"="thick","dusus"="fall"))
+lemMeta=data.table(na.omit(lemMeta))
+
+# Swedish
+lemMetaSwe=lemMeta[lemMeta$Language=="Swedish"]
+lemMetaSwe[,Freq := .N, by=Lemma]
+lemMetaSwe=lemMetaSwe[,-2]
+lemMetaSwe=unique(lemMetaSwe)
+lemMetaSwe=lemMetaSwe[order(-Freq)]
+lemMetaSwe=lemMetaSwe[1:10,]
+
+LemSwe=ggplot(lemMetaSwe,aes(reorder(Lemma,Freq),Freq)) + 
+  geom_bar(stat = "identity",aes(fill=Metaphor),colour="gray30") +
+  #scale_fill_viridis("Lemma",discrete = TRUE, option = "D") +
+  #scale_fill_manual("Lemma",values=cols_4) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Swedish lemmata grouped by metaphor") +
+  xlab("Words") +
+  ylab("Frequency") +
+  coord_flip() +
+  theme_minimal()
+LemSwe
+
+# Turkish
+lemMetaTur=lemMeta[lemMeta$Language=="Turkish"]
+lemMetaTur[,Freq := .N, by=Lemma]
+lemMetaTur=lemMetaTur[,-2]
+lemMetaTur=unique(lemMetaTur)
+lemMetaTur=lemMetaTur[order(-Freq)]
+lemMetaTur=lemMetaTur[1:10,]
+
+LemTur=ggplot(lemMetaTur,aes(reorder(Lemma,Freq),Freq)) + 
+  geom_bar(stat = "identity",aes(fill=Metaphor),colour="gray30") +
+  #scale_fill_viridis("Lemma",discrete = TRUE, option = "D") +
+  #scale_fill_manual("Lemma",values=cols_4) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  ggtitle("Turkish lemmata grouped by metaphor") +
+  xlab("Words") +
+  ylab("Frequency") +
+  coord_flip() +
+  theme_minimal()
+LemTur
+
+
+#-------------------------------------------------------------------------------
+## ALL FIGURES IN ONE
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+multiplot(BarSwe,LemSwe,Bartur,LemTur,cols=2)

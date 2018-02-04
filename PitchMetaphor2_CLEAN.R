@@ -29,14 +29,20 @@ df$Words=gsub("√§","ä",df$Words)
 ### WRITE NEW DATAFILE
 write.csv2(df,"PitchMetaphor2_CLEAN.csv")
 
-### WRITE AGAIN (AFTER MANUAL EDITS) - NEED TO CHANGE CHARACTERS AGAIN
+### WRITE AGAIN (AFTER MANUAL EDITS) - NEED TO CHANGE Metaphor labels
 df = read.csv2("PitchMetaphor2_CLEAN_edit.csv")
 
-df$Words=gsub("√∂","ö",df$Words)
-df$Words=gsub("√•","å",df$Words)
-df$Words=gsub("√§","ä",df$Words)
+df2=df
+df2$Metaphor[df2$Words=="ince"] = "Thickness"
+df2$Metaphor[df2$Words=="kalin"] = "Thickness"
+df2$Metaphor[df2$Words=="koyu"] = "Brightness"
 
-write.csv2(df,"PitchMetaphor2_CLEAN_edit.csv")
+write.csv2(df2,"PitchMetaphor2_CLEAN_edit_2.csv")
+
+df3=df2
+df3$Metaphor[df3$Words=="högt"] = "Height"
+
+write.csv2(df3,"PitchMetaphor2_CLEAN_edit_3.csv")
 
 
 ### CREATE FILE WITH GENERAL COMMENTS AND FILE NAME
