@@ -66,6 +66,8 @@ df$GestureExpress[df$Dimension=="vert" & df$Handshape=="grip"] = "Mixed"
 #verify that values are correct
 table(df$Dimension,df$Handshape,df$GestureExpress)
 
+# Write new file
+write.csv2(df,"PitchMetaphor2_CLEAN_edit_gesture_2.csv")
 #-------------------------------------------------------------------------------
 ### CREATE FIGURES
 
@@ -179,3 +181,42 @@ barExpT <- ggplot(expT, aes(x=Metaphor, y=value,fill=variable)) +
         axis.title.y=element_text(face="bold",size=17),
         axis.text.y=element_text(size=15))
 barExpT
+
+#---------------------
+## FIGURES IN ONE
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+multiplot(barExpS,barExpT,cols=2)

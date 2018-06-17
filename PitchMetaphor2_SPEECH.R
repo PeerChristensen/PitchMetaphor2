@@ -16,10 +16,12 @@ library(plyr)
 library(Hmisc)
 library(reshape)
 library(data.table)
+library(jtools)
+library(viridis)
 
 df = read.csv2("PitchMetaphor2_CLEAN_edit_3.csv",header=T,stringsAsFactors=FALSE)
 df = df[,-c(1)]
-
+df$Participant=factor(df$Participant)
 #-------------------------------------------------------------------------------
 ### NUMBER OF OBSERVATIONS
 
@@ -36,10 +38,52 @@ allMetaphors = table(df$Metaphor,df$Language)
 # Categorise metaphors with < 10 obs. as "Other"
 # Or < 3 % : prop.table(ftable(allMetaphors),2)*100
 df$Metaphor[df$Metaphor=="?" | df$Metaphor=="Mildness" | df$Metaphor=="Strength" |
-              df$Metaphor=="Openness" | df$Metaphor=="Roughness" |
-              df$Metaphor=="Roundness" | df$Metaphor=="Sharpness"] = "Other"
+              df$Metaphor=="Openness" | df$Metaphor=="Roughness" | df$Metaphor=="Softness" |
+              df$Metaphor=="Roundness" | df$Metaphor=="Sharpness" | df$Metaphor=="Mass"] = "Other"
+df$Metaphor=factor(df$Metaphor)
 
-# By language
+
+#WEIGHTED
+df %>%
+  group_by(Language,Participant,Metaphor) %>%
+  summarise (n = n()) %>%
+  complete(Metaphor, nesting(Participant), fill = list(n = 0)) %>%
+  mutate(freq = n / sum(n), wt=sum(n)) %>%
+  ddply(c("Language","Metaphor"),summarise,
+      Freq = weighted.mean(freq,wt),
+      se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant)))) %>%
+  ggplot(aes(x=Metaphor,y=Freq,fill=Metaphor)) +
+  geom_bar(stat="identity",colour="black",size=.2) +
+  geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2) +
+  facet_wrap(~Language) +
+  theme_apa(legend.pos = "none") + 
+  scale_fill_viridis_d(option = "D",alpha=.8,begin=.1,end=.95) +
+  ggtitle("Distribution of speech metaphors") +
+  ylab("Weighted mean proportions") +
+  xlab("Metaphors")
+  
+
+#UNWEIGHTED   
+df %>%
+  group_by(Language, Participant, Metaphor) %>%
+  summarise(n=n()) %>%
+  complete(Metaphor, nesting(Participant), fill = list(n = 0)) %>%
+  mutate(freq = n / sum(n)) %>% 
+  ddply(c("Language","Metaphor"),summarise,
+        Freq = mean(freq),
+        se = sqrt(sd(freq))/sqrt(length(unique(Participant)))) %>%
+  ggplot(aes(x=Metaphor,y=Freq,fill=Metaphor)) +
+  geom_bar(stat="identity",colour="black",size=.2) +
+  geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2) +
+  facet_wrap(~Language) +
+  theme_apa(legend.pos = "none") + 
+  scale_fill_viridis_d(option = "D",alpha=.8,begin=.1,end=.95) +
+  ggtitle("Distribution of speech metaphors") +
+  ylab("Mean proportions")  +
+  xlab("Metaphors")
+
+
+
 #Swedish
 sweDat=df[df$Language=="Swedish",]
 sweDat=ftable(sweDat$Participant,sweDat$Metaphor)

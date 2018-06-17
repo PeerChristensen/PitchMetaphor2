@@ -1,0 +1,27 @@
+<!-- html table generated in R 3.4.0 by xtable 1.8-2 package -->
+<!-- Tue Apr 17 13:59:29 2018 -->
+<table border=1>
+<tr> <th>  </th> <th> Time </th> <th> CommentsIL </th> <th> DimensionIL </th> <th> Dimension </th> <th> HandshapeIL </th> <th> Handshape </th> <th> File </th> <th> Language </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td align="right"> 166.00 </td> <td>  </td> <td> vert </td> <td> vert </td> <td> flat H </td> <td> other </td> <td> 10 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 2 </td> <td align="right"> 311.00 </td> <td>  </td> <td> vert </td> <td> none </td> <td> grip </td> <td> grip </td> <td> 10 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 3 </td> <td align="right"> 313.00 </td> <td>  </td> <td> vert </td> <td> none </td> <td> grip </td> <td> grip </td> <td> 10 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 4 </td> <td align="right"> 253.00 </td> <td> I am not quite sure about the vertical dimension, though; it looks like she is using the hand to indicate height, but it is not so clear to me. </td> <td> vert </td> <td> none </td> <td> other </td> <td> other </td> <td> 12 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 5 </td> <td align="right"> 35.00 </td> <td>  </td> <td> none </td> <td> none </td> <td> other </td> <td> grip </td> <td> 13 </td> <td> Turkish </td> </tr>
+  <tr> <td align="right"> 6 </td> <td align="right"> 669.00 </td> <td>  </td> <td> none </td> <td> none </td> <td> other </td> <td> grip </td> <td> 13 </td> <td> Turkish </td> </tr>
+  <tr> <td align="right"> 7 </td> <td align="right"> 466.00 </td> <td> I think I see two gestures here: one made with two hands, where I clearly see a size dimension and a wide grip; and a second one, made with her right hand, where I don't think there's a size dimension but there's still a neutral grip in the shape of the hand. I considered the first in the annotation. </td> <td> size </td> <td> none </td> <td> grip </td> <td> grip </td> <td> 14 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 8 </td> <td align="right"> 33.00 </td> <td>  </td> <td> none </td> <td> none </td> <td> point </td> <td> other </td> <td> 15 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 9 </td> <td align="right"> 288.00 </td> <td>  </td> <td> size </td> <td> size </td> <td> grip </td> <td> other </td> <td> 15 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 10 </td> <td align="right"> 463.00 </td> <td>  </td> <td> vert </td> <td> none </td> <td> flat H </td> <td> flat H </td> <td> 15 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 11 </td> <td align="right"> 102.00 </td> <td> I had some problems with this one, 'cause it may looks like she is indicating the size of something. Eventually I decided to look only at the right hand, though, as it is the only one which is actually moving. Looking only at that I could think about a vertical dimension, but I've been pretty insecure on this one. </td> <td> vert </td> <td> vert </td> <td> other </td> <td> flat H </td> <td> 15 </td> <td> Turkish </td> </tr>
+  <tr> <td align="right"> 12 </td> <td align="right"> 273.00 </td> <td>  </td> <td> size </td> <td> none </td> <td> grip </td> <td> grip </td> <td> 16 </td> <td> Turkish </td> </tr>
+  <tr> <td align="right"> 13 </td> <td align="right"> 455.00 </td> <td>  </td> <td> vert </td> <td> vert </td> <td> grip </td> <td> other </td> <td> 16 </td> <td> Turkish </td> </tr>
+  <tr> <td align="right"> 14 </td> <td align="right"> 142.00 </td> <td>  </td> <td> vert </td> <td> none </td> <td> grip </td> <td> other </td> <td> 16 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 15 </td> <td align="right"> 82.00 </td> <td>  </td> <td> vert </td> <td> none </td> <td> flat H </td> <td> flat H </td> <td> 1 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 16 </td> <td align="right"> 1372.00 </td> <td>  </td> <td> vert </td> <td> vert </td> <td> grip </td> <td> other </td> <td> 1 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 17 </td> <td align="right"> 642.00 </td> <td> At first, looking at the right hand, I considered it as a flat V; but looking at both of the hands and at the gesture in its entirety, I've eventually decided for "other". </td> <td> vert </td> <td> none </td> <td> other </td> <td> other </td> <td> 3 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 18 </td> <td align="right"> 79.00 </td> <td>  </td> <td> none </td> <td> size </td> <td> other </td> <td> grip </td> <td> 4 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 19 </td> <td align="right"> 76.00 </td> <td>  </td> <td> size </td> <td> vert </td> <td> grip </td> <td> other </td> <td> 7 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 20 </td> <td align="right"> 355.00 </td> <td>  </td> <td> size </td> <td> none </td> <td> grip </td> <td> grip </td> <td> 7 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 21 </td> <td align="right"> 385.00 </td> <td>  </td> <td> none </td> <td> none </td> <td> grip </td> <td> other </td> <td> 9 </td> <td> Swedish </td> </tr>
+  <tr> <td align="right"> 22 </td> <td align="right"> 36.00 </td> <td>  </td> <td> none </td> <td> vert </td> <td> other </td> <td> other </td> <td> 9 </td> <td> Turkish </td> </tr>
+   </table>

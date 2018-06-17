@@ -10,8 +10,8 @@ Participant ID;Age;Sex;Education;Multilingual;Language 1;Language 1: Years of us
 8;27;Female;Graduate school (Masters);Yes;Swedish;0;Turkish;1;Kurdish;1;English;1;Sweden;Sweden;;;;;;;;;;Swedish;7;Turkish;6;Kurdish;4;English;6;Turkish;Swedish;Swedish;Swedish;
 9;39;Male;High school;Yes;Swedish;20;Turkish;1;English;13;;;Sweden;Turkey;20;;;;;;;;;Turkish;7;Swedish;7;English;4;;;Swedish;Turkish;;Swedish;
 10;26;Male;College (BA/BS);Yes;Swedish;0;Turkish;1;Farsi;1;English;4;Sweden;Sweden;;Turkey;7;Turkish;5;;;;;Turkish;5;Swedish;7;Farsi;6;English;6;Farsi;Swedish;English;;uses farsi and turkish at home
-11;50;Female;High school;Yes;Swedish;7;Turkish;1;;;;;Sweden;Turkey;;;;;;;;;;Turkish;7;Swedish;7;;;;;Turkish;Swedish;;Swedish;
-12;24;Female;High school;Yes;Swedish;0;Turkish;1;Spanish;12;;;Sweden;Sweden;;;;;;;;;;Turkish;7;Swedish;7;English;5;;;Turkish;Turkish;Swedish;;
+11;50;Female;High school;Yes;Swedish;7;Turkish;1;;;;;Sweden;Turkey;;;;;;;;;;;7;;7;;;;;Turkish;Swedish;;Swedish;
+12;24;Female;High school;Yes;Swedish;0;Turkish;1;Spanish;12;;;Sweden;Sweden;;;;;;;;;;;7;;7;;5;;;Turkish;Turkish;Swedish;;
 13;48;Male;College (BA/BS);Yes;Swedish;20;Turkish;1;;;;;Sweden;Turkey;20;;;;;;;;;Turkish;7;Swedish;6;;;;;Swedish;Turkish;;Swedish;
 14;25;Female;College (BA/BS);Yes;Swedish;0;Turkish;1;English;6;;;Sweden;Sweden;;Turkey;7;Turkish;7;;;;;Swedish;7;Turkish;5;;;;;Turkish;Swedish;;Swedish;
 15;20;Female;College (BA/BS);Yes;Swedish;0;Turkish;1;English;3;;;Sweden;Turkey;0;Turkey;60;Turkish;7;;;;;Swedish;7;Turkish;7;English;6;;;Turkish;Swedish;Swedish;;
