@@ -16,6 +16,8 @@ library(tidytext)
 library(jtools)
 library(forcats)
 library(magrittr)
+library(lme4)
+library(lmerTest)
 
 # -----------------------------------------
 # PLOT THEME
@@ -52,6 +54,11 @@ df %<>%
   mutate(Metaphor = fct_lump(Metaphor))     %>%
   as_tibble()
 
+# variable for language-specific metaphor usage
+df$LangSpec=ifelse(df$Metaphor =="Height" & df$Language == "Swedish" |
+                     df$Metaphor == "Thickness" & df$Language == "Turkish",1,0)
+
+
 #labels <- c(Swedish = "Swedish - HEIGHT", Turkish = "Turkisk - THICKNESS")
 labels <- c(Swedish = "Swedish\nHEIGHT", Turkish = "Turkisk\nTHICKNESS")
 
@@ -70,9 +77,11 @@ df %>%
   plyr::ddply(c("Language","Metaphor"),summarise,
               Freq = weighted.mean(freq,wt),
               se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant)))) %>%
+  mutate(LangSpec = ifelse(Language=="Swedish" & Metaphor =="Height" | Language=="Turkish" & Metaphor =="Thickness",1,0)) %>%
   #filter(Freq > 0.02) %>%
-  ggplot(aes(x=Metaphor,y=Freq)) +
-  geom_bar(stat="identity", fill = viridis_pal(option = "B", begin = .2, end = .7, direction = -1)(1)) +
+  ggplot(aes(x=Metaphor,y=Freq,fill=LangSpec)) +
+  geom_bar(stat="identity") +
+  scale_fill_viridis_c(option = "B", begin = .2, end = .7, direction = -1, guide=F) +
   geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2) +
   facet_wrap(~Language, scales = "free_x") +
   my_theme() + 
@@ -83,15 +92,12 @@ df %>%
   ylab("Weighted mean proportions") +
   xlab("Metaphors")
 
-ggsave("wSpeech_bilinguals.png", width = 10, height=10)
+ggsave("wSpeech_bilinguals_v2.png", width = 10, height=10)
 
+# -----------------------------------------
+# GESTURE
 
-
-
-
-
-df = df %>% filter(Gesture == "1", Language == "Swedish" |
-                     Language == "Turkish" & Metaphor == "Thickness")
+df = df %>% filter(Gesture == 1, LangSpec ==1)
 #df = df %>% filter(Gesture == "1", Language == "Swedish" & Metaphor == "Brightness")
 
 
@@ -103,13 +109,18 @@ df = df %>%
       Metaphor=="Thickness" & Dimension=="vert" & grepl("grip",Handshape)==T ~ "Mixed",
     
     Metaphor=="Height" & grepl("grip",Handshape)==T |
-      Metaphor=="Thickness" & Dimension=="vert" & Handshape == "flat H" ~ "No",
+      Metaphor=="Thickness" & Handshape == "flat H" ~ "No",
+    Metaphor=="Height" & Dimension=="size" |
+      Metaphor=="Thickness" & Dimension=="vert" ~ "No",
     
-    Metaphor=="Height" & Dimension =="vert" & Handshape=="flat H" |
+    Metaphor=="Height" & Dimension =="vert" |
+      Metaphor=="Thickness" & Dimension =="size" ~ "Yes",
+    Metaphor=="Height" & Handshape=="flat H" |
       Metaphor=="Thickness" & grepl("grip",Handshape)==T ~ "Yes"
   )))
+
 df$Converge <- factor(df$Converge, 
-                      levels=c("Yes", "No", "Mixed"))
+                      levels=c("Yes", "No"))
 
 # verticality
 df = df %>%
@@ -127,6 +138,8 @@ table(df$Language)
 #######################################
 # CONVERGENCE
 
+df %<>% filter(!is.na(Converge))
+
 df %>% 
   filter(!is.na(Converge)) %>%
   group_by(Language, Participant, Converge) %>%
@@ -136,8 +149,10 @@ df %>%
   group_by(Language, Converge) %>%
   summarise(Freq = weighted.mean(freq,wt),
             se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant)))) %>%
-  ggplot(aes(x=Converge,y=Freq, fill = Language)) +
-  geom_bar(position=position_dodge(.9),stat="identity") +
+  filter(Converge=="Yes") %>% # !!!
+  ggplot(aes(x=Language,y=Freq)) +
+  geom_bar(position=position_dodge(.9),stat="identity",
+           fill = viridis_pal(option = "B", begin = .2, end = .7, direction = -1)(1)) +
   geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2,position=position_dodge(.9)) +
   #facet_wrap(~Language, labeller=labeller(Language = labels)) +
   my_theme() + 
@@ -145,12 +160,12 @@ df %>%
         legend.key.width = unit(2.5, "lines"),
         legend.key.height = unit(2.5, "lines")) +
   coord_cartesian(ylim=c(0,1)) +
-  scale_fill_viridis_d(option= "B",begin = .2, end = .7) +
   #ggtitle("Speech-gesture incongruence") +
-  ylab("weighted mean proportions") +
-  xlab("Convergence")
+  scale_x_discrete("Language & Metaphor",labels=labels) +
+  labs(y="weighted mean proportions") +
+  NULL
 
-ggsave("wConvergenceFull.png", width = 10, height=10)
+ggsave("wConvergence_biling.png", width = 10, height=10)
 
 
 ######################################################
@@ -250,3 +265,9 @@ tur_mixed %>%
   ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="yellow3") +
   theme_void()
 ggsave("tur_mix.png",width = 10, height=10)
+
+###########################################
+# reg mods
+
+# SPEECH
+summary(glmer(LangSpec ~ Language + (1|Participant), data=df, family="binomial"))
