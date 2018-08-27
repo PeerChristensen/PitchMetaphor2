@@ -10,6 +10,7 @@
 #FEBRUARY 2018
 library(tidyr)
 library(plyr)
+library(tidyverse)
 
 lhq = read.csv2("LHQ_biling.csv",header=T,stringsAsFactors=FALSE,skip=1)
 
@@ -45,6 +46,20 @@ aggSpeak$sd[is.na(aggSpeak$sd)] = 0
 aggSpeak$se=round(aggSpeak$sd/sqrt(length(aggSpeak$n)),2)
 aggSpeak
 
+# test difference in speaking ability - Swe-Tur
+df_1 <- lhq %>% 
+  select(Participant.ID, Language.1,Language.1..Speaking) %>% 
+  rename("Lang" = Language.1, "Rating" = Language.1..Speaking)
+
+df_2 <- lhq %>% 
+  select(Participant.ID, Language.2,Language.2..Speaking) %>% 
+  rename("Lang" = Language.2, "Rating" = Language.2..Speaking)
+
+df <- full_join(df_1,df_2)
+
+t.test(Rating~Lang,df) # n.s.
+
+d %>% gather(.,-Participant.ID)
 # language use in different contexts
 use=lhq[,c(1,33:36)]
 home=table(use$At.home..Speaking)
@@ -54,4 +69,17 @@ friends
 occupation=table(unite(use, "occupation", c("At.school..Speaking","At.work..Speaking"),sep="")$occupation)
 occupation
 
+# AoA
+aoa_1 <- lhq %>% 
+  select(Participant.ID, Language.1,Language.1..Years.of.use) %>% 
+  rename("Lang" = Language.1, "AoA" = Language.1..Years.of.use)
+
+aoa_2 <- lhq %>% 
+  select(Participant.ID, Language.2,Language.2..Years.of.use) %>% 
+  rename("Lang" = Language.2, "AoA" = Language.2..Years.of.use) %>%
+  mutate(AoA = recode(AoA, `1`=0L))
+
+df_aoa <- full_join(aoa_1,aoa_2)
+
+t.test(AoA~Lang,df_aoa) # n.s.
 
