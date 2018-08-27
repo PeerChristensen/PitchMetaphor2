@@ -39,10 +39,11 @@ my_theme <- function() {
 # -----------------------------------------
 # LOAD AND CLEAN DATA
 
-df <- read.csv2("PitchMetaphor2_CLEAN_edit_gesture.csv",header=T,stringsAsFactors=FALSE)
+df <- read_csv2("PitchMetaphor2_CLEAN_edit_gesture_2.csv")
 df_original <- df # saving original metaphor levels
 df %<>% 
-  select(-c(X,X.1,X.2,Time))                     %>% 
+  #select(-c(X,X.1,X.2,Time))                     %>% 
+  select(-c(X1,Time))                     %>% 
   mutate(Participant = factor(Participant),
          Metaphor    = factor(Metaphor)   ,
          Language    = factor(Language)   ,
@@ -60,8 +61,6 @@ labels <- c(Swedish = "Swedish\nHEIGHT", Turkish = "Turkisk\nTHICKNESS")
 
 df$Metaphor = fct_relevel(df$Metaphor, levels= c("Height", "Brightness", "Thickness", "Other"))
 
-levels(df$Metaphor = c("Height", "Brightness", "Thickness", "Other"))
-
 # WEIGHTED
 df %>%
   group_by(Language, Participant, Metaphor) %>%
@@ -71,7 +70,7 @@ df %>%
   plyr::ddply(c("Language","Metaphor"),summarise,
               Freq = weighted.mean(freq,wt),
               se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant)))) %>%
-  filter(Freq > 0.02) %>%
+  #filter(Freq > 0.02) %>%
   ggplot(aes(x=Metaphor,y=Freq)) +
   geom_bar(stat="identity", fill = viridis_pal(option = "B", begin = .2, end = .7, direction = -1)(1)) +
   geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2) +

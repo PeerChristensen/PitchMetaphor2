@@ -18,6 +18,7 @@ library(reshape)
 library(data.table)
 library(jtools)
 library(viridis)
+library(tidyverse)
 
 df = read.csv2("PitchMetaphor2_CLEAN_edit_3.csv",header=T,stringsAsFactors=FALSE)
 df = df[,-c(1)]
