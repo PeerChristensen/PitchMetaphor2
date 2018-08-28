@@ -97,7 +97,7 @@ ggsave("wSpeech_bilinguals_v2.png", width = 10, height=10)
 # -----------------------------------------
 # GESTURE
 
-df = df %>% filter(Gesture == 1, LangSpec ==1)
+#df = df %>% filter(Gesture == 1, LangSpec ==1)
 #df = df %>% filter(Gesture == "1", Language == "Swedish" & Metaphor == "Brightness")
 
 
@@ -125,10 +125,10 @@ df$Converge <- factor(df$Converge,
 # verticality
 df = df %>%
   mutate(Vert = factor(case_when(
-    Dimension == "vert" & grepl("grip",Handshape) == TRUE ~ "Mixed",
-    Dimension == "vert" & Handshape == "flat H" ~ "Yes",
-    grepl("grip",Handshape) == TRUE ~ "No"
-  )))
+   # Dimension == "vert" & grepl("grip",Handshape) == TRUE ~ "Mixed",
+    Dimension == "vert" ~ "Yes",
+    Handshape == "flat H" ~ "Yes",
+    grepl("grip",Handshape) == TRUE | Dimension=="size" ~ "No")))
 
 # n observations
 nrow(df)
@@ -138,10 +138,9 @@ table(df$Language)
 #######################################
 # CONVERGENCE
 
-df %<>% filter(!is.na(Converge))
 
 df %>% 
-  filter(!is.na(Converge)) %>%
+  filter(!is.na(Converge),Gesture==1) %>%
   group_by(Language, Participant, Converge) %>%
   summarise(n = n()) %>%
   complete(Converge, nesting(Participant), fill = list(n = 0)) %>%
@@ -172,7 +171,7 @@ ggsave("wConvergence_biling.png", width = 10, height=10)
 # Verticality
 
 df %>%
-  filter(!is.na(Vert)) %>%
+  filter(!is.na(Vert),LangSpec==1) %>%
   group_by(Language, Participant, Vert) %>%
   summarise(n = n()) %>%
   complete(Vert, nesting(Participant), fill = list(n = 0)) %>%
@@ -191,15 +190,15 @@ df %>%
   scale_fill_viridis_d(option= "B",begin = .2, end = .7) +
   #ggtitle("Speech-gesture incongruence") +
   ylab("weighted mean proportions") +
-  scale_x_discrete("Language",labels=labels)
+  scale_x_discrete("Language & Metaphor",labels=labels)
 
-ggsave("wVertical.png", width = 10, height=10)
+ggsave("wVertical_biling.png", width = 10, height=10)
 
 # VERTICALITY WITH BRIGHTNESS
 
 labels2 <- c(Brightness = "Swedish\nBRIGHTNESS", Height = "Swedish\nHEIGHT", Thickness = "Turkisk\nTHICKNESS")
 
-df %>%
+#df %>%
   filter(!is.na(Vert)) %>%
   group_by(Language, Metaphor, Participant, Vert) %>%
   summarise(n = n()) %>%
@@ -221,7 +220,7 @@ df %>%
   ylab("weighted mean proportions") +
   scale_x_discrete("Language and Metaphor",labels=labels2)
 
-ggsave("wVerticalWBright.png", width = 10, height=10)
+#ggsave("wVerticalWBright.png", width = 10, height=10)
 ######################################################
 # Point plots
 
@@ -230,44 +229,53 @@ df %>%
   group_by(Language, Participant, Converge) %>%
   summarise(n = n()) %>% group_by(Language,Converge) %>% summarise(sum(n))
 
-swe_conv=tibble(a=rep(1,173),b=rep(1,173))
+swe_conv=tibble(a=rep(1,72),b=rep(1,72))
 swe_conv %>%
-  ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="green3") +
+  ggplot(aes(a,b)) + geom_jitter(size=18, alpha=.8, colour="green3") +
   theme_void()
-ggsave("swe_conv.png",width = 10, height=10)
+ggsave("swe_conv_biling.png",width = 10, height=10)
 
-swe_diverge=tibble(a=rep(1,13),b=rep(1,13))
+swe_diverge=tibble(a=rep(1,2),b=rep(1,2))
 swe_diverge %>%
-  ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="red3") +
+  ggplot(aes(a,b)) + geom_jitter(size=18, alpha=.8, colour="red3") +
   theme_void()
-ggsave("swe_div.png",width = 10, height=10)
+ggsave("swe_div_biling.png",width = 10, height=10)
 
-swe_mixed=tibble(a=rep(1,26),b=rep(1,26))
+#swe_mixed=tibble(a=rep(1,26),b=rep(1,26))
 swe_mixed %>%
   ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="yellow3") +
   theme_void()
-ggsave("swe_mix.png",width = 10, height=10)
+#ggsave("swe_mix.png",width = 10, height=10)
 
-tur_conv=tibble(a=rep(1,94),b=rep(1,94))
+tur_conv=tibble(a=rep(1,98),b=rep(1,98))
 tur_conv %>%
-  ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="green3") +
+  ggplot(aes(a,b)) + geom_jitter(size=18, alpha=.8, colour="green3") +
   theme_void()
-ggsave("tur_conv.png",width = 10, height=10)
+ggsave("tur_conv_biling.png",width = 10, height=10)
 
-tur_diverge=tibble(a=rep(1,35),b=rep(1,35))
+tur_diverge=tibble(a=rep(1,15),b=rep(1,15))
 tur_diverge %>%
-  ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="red3") +
+  ggplot(aes(a,b)) + geom_jitter(size=18, alpha=.8, colour="red3") +
   theme_void()
-ggsave("tur_div.png",width = 10, height=10)
+ggsave("tur_div_biling.png",width = 10, height=10)
 
-tur_mixed=tibble(a=rep(1,8),b=rep(1,8))
+#tur_mixed=tibble(a=rep(1,8),b=rep(1,8))
 tur_mixed %>%
   ggplot(aes(a,b)) + geom_jitter(size=15, alpha=.8, colour="yellow3") +
   theme_void()
-ggsave("tur_mix.png",width = 10, height=10)
+#ggsave("tur_mix.png",width = 10, height=10)
 
 ###########################################
 # reg mods
 
 # SPEECH
 summary(glmer(LangSpec ~ Language + (1|Participant), data=df, family="binomial"))
+
+# CONVERGENCE
+conv_df = df %>% filter(!is.na(Converge),LangSpec==1)
+summary(glm(Converge ~ Language, data=conv_df, family="binomial"))
+
+
+# VERTICALITY
+summary(glmer(Converge ~ Metaphor + (1|Participant), data=df, family="binomial"))
+
