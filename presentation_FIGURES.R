@@ -193,11 +193,11 @@ df %>%
             se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant))),
             n = sum(n)) %>%
   filter(Converge=="Yes") %>% # !!!
-  ggplot(aes(x=Metaphor,y=Freq)) +
+  ggplot(aes(x=Language,y=Freq)) +
   geom_bar(position=position_dodge(.9),stat="identity",
            fill = viridis_pal(option = "B", begin = .2, end = .7, direction = -1)(1)) +
   geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2,position=position_dodge(.9)) +
-  facet_wrap(~Language) +
+  facet_wrap(~Metaphor) +
   my_theme() + 
   theme(legend.text = element_text(size=20),
         legend.key.width = unit(2.5, "lines"),
@@ -221,7 +221,7 @@ df %>%
             se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant))),
             n = sum(n)) %>%
   filter(Converge=="Yes") %>% # !!!
-  ggplot(aes(x=Metaphor,y=Freq, fill =Language)) +
+  ggplot(aes(x=Language,y=Freq, fill =Metaphor)) +
   geom_bar(position=position_dodge(.9),stat="identity") +
   geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2,position=position_dodge(.9)) +
   scale_fill_viridis_d(option = "B", begin = .2, end = .7, direction = -1) +
@@ -345,13 +345,13 @@ summary(glmer(LangSpec ~ Language + (1|Participant), data=df, family="binomial")
 df_conv = df%>%select(Language,Metaphor,Converge,Participant,LangSpec,Gesture) %>% filter(LangSpec==1,Gesture==1)
 df_conv$Converge[df_conv$Converge=="Mixed"] = "No"
 
-summary(glmer(Converge ~ Language + (1|Participant), data=df_conv, family="binomial"))
+summary(glmer(Converge ~ Metaphor + (1|Participant), data=df_conv, family="binomial",
+              control=glmerControl(optimizer="bobyqa",optCtrl=list(maxfun=2e5))))
 
 # CONVERGENCE with spatial metaphor
 df$Spatial = if_else(df$Metaphor == "Height" | df$Metaphor == "Thickness",1,0)
 df_space = df%>%select(Language,Metaphor,Dimension,Handshape,Converge,Participant,Order, Spatial) %>% filter(Spatial==1)
 df_space$Converge[df_space$Converge=="Mixed"] = "No"
-
 
 fit1 = glmer(Converge ~ Language +(1|Participant), data=df_space, family="binomial") # ns
 fit2 = glmer(Converge ~ Language + Metaphor +(1|Participant), data=df_space, family="binomial") 

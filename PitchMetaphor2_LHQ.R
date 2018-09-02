@@ -11,6 +11,7 @@
 library(tidyr)
 library(plyr)
 library(tidyverse)
+library(magrittr)
 
 lhq = read.csv2("LHQ_biling.csv",header=T,stringsAsFactors=FALSE,skip=1)
 
@@ -60,7 +61,10 @@ df <- full_join(df_1,df_2)
 t.test(Rating~Lang,df) # n.s.
 
 d %>% gather(.,-Participant.ID)
+
+#########################################
 # language use in different contexts
+
 use=lhq[,c(1,33:36)]
 home=table(use$At.home..Speaking)
 home
@@ -69,17 +73,40 @@ friends
 occupation=table(unite(use, "occupation", c("At.school..Speaking","At.work..Speaking"),sep="")$occupation)
 occupation
 
+# PLOT
+use=lhq[,c(1,33:36)]
+use %<>% as_tibble() %>%
+  dplyr::rename(Home = contains("home"), Friends = contains("friends")) %>%
+  unite("School/Work", c(contains("school"),contains("work")),sep="") %>%
+  mutate("School/Work" = recode(`School/Work`,"SwedishSwedish"="Swedish")) %>%
+  mutate(Home = fct_lump(Home,n=2), `School/Work` = fct_lump(`School/Work`)) %>%
+  select(-Participant.ID)
+
+use %>% count(Home)
+
+
+  
+############################################
 # AoA
 aoa_1 <- lhq %>% 
   select(Participant.ID, Language.1,Language.1..Years.of.use) %>% 
-  rename("Lang" = Language.1, "AoA" = Language.1..Years.of.use)
+  dplyr::rename("Language" = Language.1, "AoA" = Language.1..Years.of.use)
 
 aoa_2 <- lhq %>% 
   select(Participant.ID, Language.2,Language.2..Years.of.use) %>% 
-  rename("Lang" = Language.2, "AoA" = Language.2..Years.of.use) %>%
+  dplyr::rename("Language" = Language.2, "AoA" = Language.2..Years.of.use) %>%
   mutate(AoA = recode(AoA, `1`=0L))
 
 df_aoa <- full_join(aoa_1,aoa_2)
 
-t.test(AoA~Lang,df_aoa) # n.s.
+t.test(AoA~Language,df_aoa) # n.s.
+
+######
+# table AoA, speaking ability
+df_aoa %<>% as_tibble() %>% group_by(Language) %>% dplyr::summarize(m = mean(AoA), sd = sd(AoA))
+
+aggSpeak %<>% filter(Language == "Swedish" | Language == "Turkish") %>% select(Language, meanRating,sd) %>%
+  dplyr::rename(m = "meanRating")
+
+
 
