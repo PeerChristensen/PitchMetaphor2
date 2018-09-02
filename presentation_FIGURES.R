@@ -237,6 +237,37 @@ df %>%
 ggsave("wConvergence_lang_biling_with_mixed_v2.png", width = 10, height=10)
 
 
+# FULL CONVERGENCE ( with mixed and no categories)
+df$Converge <- factor(df$Converge, 
+                      levels=c("Yes","No","Mixed"))
+df %>% 
+  filter(!is.na(Converge),Gesture==1, LangSpec==1) %>%
+  group_by(Language, Participant, Converge) %>%
+  summarise(n = n()) %>%
+  complete(Converge, nesting(Participant), fill = list(n = 0)) %>%
+  mutate(freq = n / sum(n), wt=sum(n)) %>%
+  group_by(Language, Converge) %>%
+  summarise(Freq = weighted.mean(freq,wt),
+            se = sqrt(wtd.var(freq,wt))/sqrt(length(unique(Participant)))) %>%
+  ggplot(aes(x=Converge,y=Freq,fill=Language)) +
+  geom_bar(position=position_dodge(.9),stat="identity") +
+  scale_fill_viridis_d(option = "B", begin = .2, end = .7, direction = -1) +
+  geom_errorbar(aes(ymin=Freq-se,ymax=Freq+se),width=.2,position=position_dodge(.9)) +
+  #facet_wrap(~Language, labeller=labeller(Language = labels)) +
+  my_theme() + 
+  theme(legend.text = element_text(size=20),
+        legend.key.width = unit(2.5, "lines"),
+        legend.key.height = unit(2.5, "lines")) +
+  coord_cartesian(ylim=c(0,1)) +
+  #ggtitle("Speech-gesture incongruence") +
+  scale_x_discrete("Language & Metaphor",labels=labels) +
+  labs(y="weighted mean proportions") +
+  NULL
+
+ggsave("full_convergence.png")
+
+df$Converge <- factor(df$Converge, 
+                      levels=c("No", "Yes","Mixed"))
 ######################################################
 # Verticality
 
@@ -379,3 +410,11 @@ df %>%
 df %>%group_by(Order,Language,LangSpec) %>%
   summarise(n=n())
 
+# Poisson regression of n cases of convergence
+d=df %>%
+filter(!is.na(Converge),Gesture==1, LangSpec==1) %>%
+group_by(Language, Participant, Converge) %>%
+summarise(n = n()) %>%
+complete(Converge, nesting(Participant), fill = list(n = 0)) %>%
+mutate(freq = n / sum(n), wt=sum(n)) %>% filter(Converge=="Yes")
+summary(glmer(n~Language+ (1|Participant),family=poisson,data=d))
