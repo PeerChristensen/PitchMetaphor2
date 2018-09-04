@@ -50,11 +50,11 @@ aggSpeak
 # test difference in speaking ability - Swe-Tur
 df_1 <- lhq %>% 
   select(Participant.ID, Language.1,Language.1..Speaking) %>% 
-  rename("Lang" = Language.1, "Rating" = Language.1..Speaking)
+  dplyr::rename("Lang" = Language.1, "Rating" = Language.1..Speaking)
 
 df_2 <- lhq %>% 
   select(Participant.ID, Language.2,Language.2..Speaking) %>% 
-  rename("Lang" = Language.2, "Rating" = Language.2..Speaking)
+  dplyr::rename("Lang" = Language.2, "Rating" = Language.2..Speaking)
 
 df <- full_join(df_1,df_2)
 
@@ -103,10 +103,14 @@ t.test(AoA~Language,df_aoa) # n.s.
 
 ######
 # table AoA, speaking ability
-df_aoa %<>% as_tibble() %>% group_by(Language) %>% dplyr::summarize(m = mean(AoA), sd = sd(AoA))
+df_aoa %>% as_tibble() %>% group_by(Language) %>% dplyr::summarize(m = mean(AoA), sd = sd(AoA))
 
 aggSpeak %<>% filter(Language == "Swedish" | Language == "Turkish") %>% select(Language, meanRating,sd) %>%
   dplyr::rename(m = "meanRating")
 
 
+######
+#regression: effects of AoA and proficiency
+
+df %<>% left_join(df_aoa, by=c("Participant" = "Participant.ID"))
 

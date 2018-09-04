@@ -52,7 +52,8 @@ df %<>%
          Order       = factor(Order)      ,
          Gesture     = factor(Gesture))     %>%
   mutate(Metaphor = fct_lump(Metaphor))     %>%
-  as_tibble()
+  as_tibble() %>%
+  select(-Comment, -Speech,  -Grammar, -General.comments, -GestureExpress, -N.Hands)
 
 # variable for language-specific metaphor usage
 df$LangSpec=ifelse(df$Metaphor =="Height" & df$Language == "Swedish" |
@@ -326,41 +327,41 @@ labels2 <- c(Brightness = "Swedish\nBRIGHTNESS", Height = "Swedish\nHEIGHT", Thi
 # Point plots
 
 df %>% 
-  filter(!is.na(Converge)) %>%
+  filter(!is.na(Converge),LangSpec==1) %>%
   group_by(Language, Participant, Converge) %>%
   summarise(n = n()) %>% group_by(Language,Converge) %>% summarise(sum(n))
 
-swe_conv=tibble(a=rep(1,72),b=rep(1,72))
+swe_conv=tibble(a=rep(1,63),b=rep(1,63))
 swe_conv %>%
   ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="green3") +
   theme_void()
 ggsave("swe_conv_biling.png",width = 3, height=3)
 
-swe_diverge=tibble(a=rep(1,2),b=rep(1,2))
-swe_diverge %>%
-  ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="red3") +
-  theme_void()
-ggsave("swe_div_biling.png",width = 3, height=3)
+#swe_diverge=tibble(a=rep(1,2),b=rep(1,2))
+#swe_diverge %>%
+#  ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="red3") +
+#  theme_void()
+#ggsave("swe_div_biling.png",width = 3, height=3)
 
-swe_mixed=tibble(a=rep(1,7),b=rep(1,7))
-swe_mixed %>%
-  ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="yellow3") +
-  theme_void()
-ggsave("swe_mix_biling.png",width = 3, height=3)
+#swe_mixed=tibble(a=rep(1,7),b=rep(1,7))
+#swe_mixed %>%
+#  ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="yellow3") +
+#  theme_void()
+#ggsave("swe_mix_biling.png",width = 3, height=3)
 
-tur_conv=tibble(a=rep(1,98),b=rep(1,98))
+tur_conv=tibble(a=rep(1,63),b=rep(1,63))
 tur_conv %>%
   ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="green3") +
   theme_void()
 ggsave("tur_conv_biling.png",width = 3, height=3)
 
-tur_diverge=tibble(a=rep(1,15),b=rep(1,15))
+tur_diverge=tibble(a=rep(1,10),b=rep(1,10))
 tur_diverge %>%
   ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="red3") +
   theme_void()
 ggsave("tur_div_biling.png",width = 3, height=3)
 
-tur_mixed=tibble(a=rep(1,3),b=rep(1,3))
+tur_mixed=tibble(a=rep(1,1),b=rep(1,1))
 tur_mixed %>%
   ggplot(aes(a,b)) + geom_jitter(size=10, alpha=.8, colour="yellow3") +
   theme_void()
@@ -369,8 +370,47 @@ ggsave("tur_mix_biling.png",width = 3, height=3)
 ###########################################
 # reg mods
 
+#add AoA and proficiency to data
+lhq = read.csv2("LHQ_biling.csv",header=T,stringsAsFactors=FALSE,skip=1)
+
+aoa_1 <- lhq %>% 
+  select(Participant.ID, Language.1,Language.1..Years.of.use) %>% 
+  dplyr::rename("Language" = Language.1, "swe_AoA" = Language.1..Years.of.use)
+
+aoa_2 <- lhq %>% 
+  select(Participant.ID, Language.2,Language.2..Years.of.use) %>% 
+  dplyr::rename("Language" = Language.2, "tur_AoA" = Language.2..Years.of.use) %>%
+  mutate(tur_AoA = recode(tur_AoA, `1`=0L))
+
+df_aoa <- full_join(aoa_1,aoa_2, by = "Participant.ID") %>% 
+  mutate(Participant.ID = factor(Participant.ID)) %>%
+  as_tibble() %>%
+  select(-Language.x,-Language.y)
+
+prof_1 <- lhq %>% 
+  select(Participant.ID, Language.1,Language.1..Speaking) %>% 
+  dplyr::rename("Language" = Language.1, "swe_Rating" = Language.1..Speaking) %>%
+  select(-Language)
+
+prof_2 <- lhq %>% 
+  select(Participant.ID, Language.2,Language.2..Speaking) %>% 
+  dplyr::rename("Language" = Language.2, "tur_Rating" = Language.2..Speaking) %>%
+  select(-Language)
+
+df_prof <- full_join(prof_1,prof_2) %>% 
+  mutate(Participant.ID = factor(Participant.ID)) %>% 
+  as_tibble()
+
+df %<>% inner_join(df_aoa, by=c("Participant" = "Participant.ID"))
+df %<>% inner_join(df_prof, by=c("Participant" = "Participant.ID"))
+
 # SPEECH
-summary(glmer(LangSpec ~ Language + (1|Participant), data=df, family="binomial"))
+summary(glmer(LangSpec ~  Language + swe_AoA + tur_AoA + (1|Participant),df, family="binomial"))
+
+# likelihood of choosing a specific spatial metaphor
+df_test=df[df$Metaphor=="Height" | df$Metaphor=="Thickness",]
+summary(glmer(Metaphor ~ swe_AoA + tur_AoA + (1|Participant),df_test, family="binomial"))
+
 
 # CONVERGENCE with lang-specific metaphor
 df_conv = df%>%select(Language,Metaphor,Converge,Participant,LangSpec,Gesture) %>% filter(LangSpec==1,Gesture==1)
@@ -394,7 +434,6 @@ summary(glmer(Vert ~ Metaphor + (1|Participant), data=df[df$LangSpec==1,], famil
 
 
 
-
 # FOR video examples
 
 #participants with both converging and diverging gestures
@@ -405,7 +444,7 @@ df %>%
   spread(Converge,n) %>%
   #select(-Mixed) %>%
   #na.omit() %>%
-  filter(Language == "Swedish", Metaphor=="Thickness")
+  filter(Language == "Turkish", Metaphor=="Thickness",!is.na(Yes))
 
 df %>%group_by(Order,Language,LangSpec) %>%
   summarise(n=n())
